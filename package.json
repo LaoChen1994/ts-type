@@ -1,0 +1,10 @@
+{
+  "name": "ts-type",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "chenyixiang <chenyixiang_cyx@youzan.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@type-challenges/utils": "^0.1.1"
+  }
+}
