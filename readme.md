@@ -1,5 +1,9 @@
 # TS类型体操记录
 
+## 写在前面
+
+[ts 类型体操github](https://github.com/type-challenges/type-challenges/)
+
 ## 01. Easy Pick
 
 ```typescript
@@ -27,7 +31,13 @@ interface IAObject {
 
 ## 2. easy readOnly 
 
-略
+只需要将key前面加上`readonly`关键字，这个变量就变成了只读。
+
+```typescript
+type MyReadOnly<T> = {
+  readonly [P in keyof T]: T[P]
+}
+```
 
 ## 3. Easy Tuple Object
 
@@ -46,7 +56,6 @@ type TupleToObject<T extends readonly any[]> = {
 当**T extends any[]**的时候，使用`T[number]`
 
 
-
 ## 4. First of Array
 
 当为空数组的时候返回never，如果数组有值返回第一个数组的第一个值
@@ -61,8 +70,6 @@ type First<T extends any[]> = T extends [] ? never : T[0];
 
 1. 取数组的第一个值：使用`T[0]`
 2. ts的三元表达式，怎么表示T是一个空数组：使用**T extends []**即可
-
-
 
 ## 5. Length of Tuple
 
@@ -84,3 +91,43 @@ type Length<T extends readonly string[]> = T["length"];
 
    这个`as const`说明一定是个`readonly`的类型
 
+## 6. Exclude
+
+```typescript
+
+type MyExclude<T, U> = T extends U ? never : T;
+
+```
+
+## 7. MyAwaited
+
+```typescript
+type MyAwaited<T extends Promise<any>> = T extends Promise<infer K>
+  ? K extends Promise<infer R>
+    ? R
+    : K
+  : never;
+```
+
+**知识点**
+
+1. 当我们使用`any`的时候，后面可以通过`infer`关键字来推断对应的类型
+2. 这里为啥通过`K extends Promise<infer R>`又判断一层，因为有两层`Promise`嵌套的场景
+
+## 8. Easy If
+
+```typescript
+type If<C, T, F> = C extends true ? (C extends null ? F : T) : F;
+```
+
+
+
+## 9. Easy Concat
+
+```typescript
+type Concat<T extends any[], U extends any[]> = [...T, ...U];
+```
+
+**知识点**
+
+1. 使用`...`运算符在`typescript`中可以达到合并两个数组的效果
