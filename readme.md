@@ -131,3 +131,28 @@ type Concat<T extends any[], U extends any[]> = [...T, ...U];
 **知识点**
 
 1. 使用`...`运算符在`typescript`中可以达到合并两个数组的效果
+
+## 10. Easy includes
+
+```typescript
+type Equal<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y
+  ? 1
+  : 2
+  ? true
+  : false;
+
+type Includes<T extends readonly any[], U> = T extends [
+  infer First,
+  ...infer Rest
+]
+  ? Equal<First, U> extends true
+    ? true
+    : Includes<Rest, U>
+  : false;
+```
+
+**知识点**
+
+1. 使用`Equal`的方法来进行判断，因为 `false extends boolean`的话直接用`extends`是没办法判断出来的
+
+2. `typescript`也可以使用递归的方式，进行调用，比如这里在`Includes`中继续使用`Includes`
