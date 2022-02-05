@@ -1,42 +1,40 @@
-# TS类型体操记录
+# TS 类型体操记录
 
 ## 写在前面
 
-[ts 类型体操github](https://github.com/type-challenges/type-challenges/)
+[ts 类型体操 github](https://github.com/type-challenges/type-challenges/)
 
 ## 01. Easy Pick
 
 ```typescript
 type MyPick<T, K extends keyof T> = {
-  [P in K]: T[P]
-}
+  [P in K]: T[P];
+};
 ```
 
 **知识点**
 
-1. 如果获取对象Key的类型？**使用`keyof`关键字**
-2. ts mapping的用法，使用 `in`关键字，其作用的是从多个类型中获取其中的一个类型（**遍历对象`keyof`拿到的值**，使用`in`关键字）
+1. 如果获取对象 Key 的类型？**使用`keyof`关键字**
+2. ts mapping 的用法，使用 `in`关键字，其作用的是从多个类型中获取其中的一个类型（**遍历对象`keyof`拿到的值**，使用`in`关键字）
 
 ```typescript
 // 比如 A 的定义是如下所示
-type A = 'a' | 'b' | 'c';
+type A = "a" | "b" | "c";
 
 // 获取类型为 'a', 'b'. 'c'的写法就是mapping
 interface IAObject {
-    [P in A]: P
+  [P in A]: P;
 }
 ```
 
+## 2. easy readOnly
 
-
-## 2. easy readOnly 
-
-只需要将key前面加上`readonly`关键字，这个变量就变成了只读。
+只需要将 key 前面加上`readonly`关键字，这个变量就变成了只读。
 
 ```typescript
 type MyReadOnly<T> = {
-  readonly [P in keyof T]: T[P]
-}
+  readonly [P in keyof T]: T[P];
+};
 ```
 
 ## 3. Easy Tuple Object
@@ -45,8 +43,8 @@ type MyReadOnly<T> = {
 
 ```typescript
 type TupleToObject<T extends readonly any[]> = {
-  [P in T[number]]: P
-}
+  [P in T[number]]: P;
+};
 ```
 
 **知识点**
@@ -55,21 +53,18 @@ type TupleToObject<T extends readonly any[]> = {
 
 当**T extends any[]**的时候，使用`T[number]`
 
-
 ## 4. First of Array
 
-当为空数组的时候返回never，如果数组有值返回第一个数组的第一个值
+当为空数组的时候返回 never，如果数组有值返回第一个数组的第一个值
 
 ```typescript
 type First<T extends any[]> = T extends [] ? never : T[0];
 ```
 
-
-
 **知识点**
 
 1. 取数组的第一个值：使用`T[0]`
-2. ts的三元表达式，怎么表示T是一个空数组：使用**T extends []**即可
+2. ts 的三元表达式，怎么表示 T 是一个空数组：使用**T extends []**即可
 
 ## 5. Length of Tuple
 
@@ -81,12 +76,12 @@ type Length<T extends readonly string[]> = T["length"];
 
 **知识点**
 
-1. 只要知道了`T extends any[]`，这个时候说明T一定是个string类型，就和`T[0]`一样可以调用T的任何属性，所以为`T[length]`
+1. 只要知道了`T extends any[]`，这个时候说明 T 一定是个 string 类型，就和`T[0]`一样可以调用 T 的任何属性，所以为`T[length]`
 
 2. 为什么要加`readOnly`，因为在这个时候题目中的`tesla`定义为
 
    ```typescript
-   const tesla = ['tesla', 'model 3', 'model X', 'model Y'] as const
+   const tesla = ["tesla", "model 3", "model X", "model Y"] as const;
    ```
 
    这个`as const`说明一定是个`readonly`的类型
@@ -94,9 +89,7 @@ type Length<T extends readonly string[]> = T["length"];
 ## 6. Exclude
 
 ```typescript
-
 type MyExclude<T, U> = T extends U ? never : T;
-
 ```
 
 ## 7. MyAwaited
@@ -119,8 +112,6 @@ type MyAwaited<T extends Promise<any>> = T extends Promise<infer K>
 ```typescript
 type If<C, T, F> = C extends true ? (C extends null ? F : T) : F;
 ```
-
-
 
 ## 9. Easy Concat
 
@@ -156,3 +147,53 @@ type Includes<T extends readonly any[], U> = T extends [
 1. 使用`Equal`的方法来进行判断，因为 `false extends boolean`的话直接用`extends`是没办法判断出来的
 
 2. `typescript`也可以使用递归的方式，进行调用，比如这里在`Includes`中继续使用`Includes`
+
+## 11. Easy Push
+
+```typescript
+type Push<T extends any[], U> = [...T, U];
+```
+
+## 12. Easy Unshift
+
+```typescript
+type Unshift<T extends any[], U> = [U, ...T];
+```
+
+**知识点**
+
+1. 使用`typescript`的扩展运算符`...`继承相应的数组内元素的类型
+
+## 13. Easy Parameters
+
+```typescript
+type MyParameters<T extends (...args: any[]) => any> = T extends (
+  ...args: infer P
+) => any
+  ? P
+  : [];
+```
+
+## 14. Medium ReturnType
+
+```typescript
+type MyReturnType<T extends (...args: any[]) => any> = T extends (
+  ...args: any[]
+) => infer P
+  ? P
+  : void;
+```
+
+## 15. Medium Omit
+
+```typescript
+type MyExclude<T, K> = T extends K ? never : T;
+
+type MyOmit<T, K extends keyof T> = {
+  [key in MyExclude<keyof T, K>]: T[key];
+};
+```
+
+**知识点**
+1. 当我们想要在某个值的场景下不返回任何东西的时候，直接返回never，会在复合类型中去除掉某值
+2. 这里我们使用`Exclude`
