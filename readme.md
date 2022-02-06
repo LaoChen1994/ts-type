@@ -197,3 +197,58 @@ type MyOmit<T, K extends keyof T> = {
 **知识点**
 1. 当我们想要在某个值的场景下不返回任何东西的时候，直接返回never，会在复合类型中去除掉某值
 2. 这里我们使用`Exclude`
+
+## 16. Medium ReadOnly
+
+和简单题中`readOnly`的区别，需要同时支持，指定的key被`readonly`和全部为`readonly`的情况
+
+```typescript
+type MyExclude<T, K> = T extends K ? never : T;
+
+type MyReadonly2<T, K extends keyof T = keyof T> = {
+  readonly [key in K]: T[key];
+} & {
+  [key2 in MyExclude<keyof T, K>]: T[key2];
+};
+```
+
+**知识点**
+1. 对象中用的`key`是一个范围定义，所以不能在一个对象中对应两个`key`，这个时候需要我们通过定义两个对象然后把他们通过 `&`进行连接
+
+## 17. Medium Deep ReadOnly
+
+对对象类型的元素需要进行`deep readonly`的操作
+
+```typescript
+// 写法一：枚举所有不需要deep readonly的类型
+type Primitive = string | number | boolean
+
+type DeepReadonly<T> = {
+  readonly [K in keyof T]: T[K] extends Primitive | Function
+    ? T[K]
+    : DeepReadonly<T[K]>;
+};
+
+// 写法二通过是否有key来判断是否为对象类型
+type DeepReadonly2<T> = {
+  readonly [K in keyof T]: keyof T[K] extends never ? T[K] : DeepReadonly<T[K]>;
+};
+
+```
+
+**知识点**
+1. 可以使用递归的方式调用Typescript的`type`类型
+2. ts中如何判断一个元素为对象，可以使用`keyof T extends never`代表如果没有key就不是一个对象。
+
+
+## 18 元组转集合
+
+```typescript
+type TupleToUnion<T extends any[]> = T[number]
+type TupleToUnion<T extends any[]> = T extends (infer P)[] ? P : never;
+```
+
+**知识点**
+
+1. `infer P`推断数组中元素的时候需要加括号，然后才加`[]`不然会不对
+2. 数组索引用`T[number]`
