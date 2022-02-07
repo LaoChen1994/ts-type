@@ -234,6 +234,8 @@ type DeepReadonly2<T> = {
   readonly [K in keyof T]: keyof T[K] extends never ? T[K] : DeepReadonly<T[K]>;
 };
 
+## 18. 
+
 ```
 
 **知识点**
@@ -252,3 +254,76 @@ type TupleToUnion<T extends any[]> = T extends (infer P)[] ? P : never;
 
 1. `infer P`推断数组中元素的时候需要加括号，然后才加`[]`不然会不对
 2. 数组索引用`T[number]`
+
+## 19. Medium Chainable
+
+需要实现的功能如下：
+
+```typescript
+declare const a: Chainable;
+
+const result = a
+  .option("foo", 123)
+  .option("bar", { value: "Hello World" })
+  .option("name", "type-challenges")
+  .get();
+
+type cases = [
+  Expect<Alike<typeof result, Expected>>
+]
+
+type Expected = {
+  foo: number
+  bar: {
+    value: string
+  }
+  name: string
+}
+
+```
+
+这道题目比较难的一点是需要不断的在option执行后的内容类似递归一样能够叠加，所以要如何做到呢~
+
+答案如下~
+```typescript
+type Chainable<T extends object = {}> = {
+  option<M extends string, V extends any>(
+    key: M,
+    value: V
+  ): V extends infer P
+    ? Chainable<
+        {
+          [key in M]: P;
+        } & T
+      >
+    : never;
+  get(): T;
+};
+```
+
+**知识点**
+
+1. 可以增加泛型 + 默认值的方式来扩展字段
+2. 对于函数的参数，如果需要使用`infer`推断，或者要将`string`类型转换成 `const`这个时候可以将参数搞成泛型，这样就可以用推断的方式来进行操作了
+
+## 20. Medium Last of Array
+
+这个题目比较简单，使用`...`这个扩展运算符即可
+
+```typescript
+
+type Last<T extends any[]> = T extends [...any[], infer P] ? P : undefined;
+
+```
+
+## 21. pop
+
+```typescript
+
+type Pop<T extends any[]> = T extends [...infer P, any] ? P : [];
+
+```
+
+**知识点**
+1. 如果需要推断数组的类型，比如`[1, 2] as const`，要直接`infer P`
+2. 如果想要推断`T[number]`,数组中索引的每一项，这个时候可以使用`(infer P)[]`
