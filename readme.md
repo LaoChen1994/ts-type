@@ -195,12 +195,13 @@ type MyOmit<T, K extends keyof T> = {
 ```
 
 **知识点**
-1. 当我们想要在某个值的场景下不返回任何东西的时候，直接返回never，会在复合类型中去除掉某值
+
+1. 当我们想要在某个值的场景下不返回任何东西的时候，直接返回 never，会在复合类型中去除掉某值
 2. 这里我们使用`Exclude`
 
 ## 16. Medium ReadOnly
 
-和简单题中`readOnly`的区别，需要同时支持，指定的key被`readonly`和全部为`readonly`的情况
+和简单题中`readOnly`的区别，需要同时支持，指定的 key 被`readonly`和全部为`readonly`的情况
 
 ```typescript
 type MyExclude<T, K> = T extends K ? never : T;
@@ -213,6 +214,7 @@ type MyReadonly2<T, K extends keyof T = keyof T> = {
 ```
 
 **知识点**
+
 1. 对象中用的`key`是一个范围定义，所以不能在一个对象中对应两个`key`，这个时候需要我们通过定义两个对象然后把他们通过 `&`进行连接
 
 ## 17. Medium Deep ReadOnly
@@ -234,19 +236,19 @@ type DeepReadonly2<T> = {
   readonly [K in keyof T]: keyof T[K] extends never ? T[K] : DeepReadonly<T[K]>;
 };
 
-## 18. 
+## 18.
 
 ```
 
 **知识点**
-1. 可以使用递归的方式调用Typescript的`type`类型
-2. ts中如何判断一个元素为对象，可以使用`keyof T extends never`代表如果没有key就不是一个对象。
 
+1. 可以使用递归的方式调用 Typescript 的`type`类型
+2. ts 中如何判断一个元素为对象，可以使用`keyof T extends never`代表如果没有 key 就不是一个对象。
 
 ## 18 元组转集合
 
 ```typescript
-type TupleToUnion<T extends any[]> = T[number]
+type TupleToUnion<T extends any[]> = T[number];
 type TupleToUnion<T extends any[]> = T extends (infer P)[] ? P : never;
 ```
 
@@ -268,23 +270,21 @@ const result = a
   .option("name", "type-challenges")
   .get();
 
-type cases = [
-  Expect<Alike<typeof result, Expected>>
-]
+type cases = [Expect<Alike<typeof result, Expected>>];
 
 type Expected = {
-  foo: number
+  foo: number;
   bar: {
-    value: string
-  }
-  name: string
-}
-
+    value: string;
+  };
+  name: string;
+};
 ```
 
-这道题目比较难的一点是需要不断的在option执行后的内容类似递归一样能够叠加，所以要如何做到呢~
+这道题目比较难的一点是需要不断的在 option 执行后的内容类似递归一样能够叠加，所以要如何做到呢~
 
 答案如下~
+
 ```typescript
 type Chainable<T extends object = {}> = {
   option<M extends string, V extends any>(
@@ -311,19 +311,45 @@ type Chainable<T extends object = {}> = {
 这个题目比较简单，使用`...`这个扩展运算符即可
 
 ```typescript
-
 type Last<T extends any[]> = T extends [...any[], infer P] ? P : undefined;
-
 ```
 
-## 21. pop
+## 21. Medium Pop
 
 ```typescript
-
 type Pop<T extends any[]> = T extends [...infer P, any] ? P : [];
-
 ```
 
 **知识点**
+
 1. 如果需要推断数组的类型，比如`[1, 2] as const`，要直接`infer P`
 2. 如果想要推断`T[number]`,数组中索引的每一项，这个时候可以使用`(infer P)[]`
+
+## 22. Medium Promise all
+
+```typescript
+declare function PromiseAll<T extends any[] = any[]>(
+  values: readonly [...T]
+): Promise<{ [K in keyof T]: T[K] extends Promise<infer R> ? R : T[K] }>;
+```
+
+**知识点**
+
+1. 将一个`any[]`转换为一个`const`在 typescript 类型中的操作为增加 readOnly，就可以将范围缩小
+2. 当一个数组`readonly`的时候，意味着他的顺序是一定的，这个时候也可以使用遍历对象的 mapped 去遍历数组
+
+## 23. Medium Type Look up
+
+```typescript
+type LookUp<U extends { type: any }, T> = U extends infer P
+  ? P extends { type: any }
+    ? T extends P["type"]
+      ? P
+      : never
+    : never
+  : never;
+```
+
+**知识点:**
+
+1. 勇敢的用`infer`直到判断出你想要的那个值

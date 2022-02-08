@@ -1,3 +1,3 @@
 type TupleToObject<T extends readonly any[]> = {
-  [P in T[number]]: P
-}
+  [P in T[number]]: P;
+};
