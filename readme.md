@@ -353,3 +353,18 @@ type LookUp<U extends { type: any }, T> = U extends infer P
 **知识点:**
 
 1. 勇敢的用`infer`直到判断出你想要的那个值
+
+
+## 24. Medium TrimLeft
+
+```typescript
+type TrimLeft<T extends string> = T extends `${infer P}${infer K}`
+  ? P extends " " | "\n" | "\t"
+    ? TrimLeft<K>
+    : T
+  : never;
+```
+
+**知识点**
+1. 使用扩展运算符的时候也能使用`infer`进行类型的判断
+2. TS递归的使用
