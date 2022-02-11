@@ -501,14 +501,69 @@ type Permutation<T extends any, U = T> = (() => T) extends () => never
 ```
 
 **知识点**
-1. type是"a" | "b" | "c", 如果想去掉一个类型，剩下两个自由组合的话可以参考下面的这个例子
+
+1. type 是"a" | "b" | "c", 如果想去掉一个类型，剩下两个自由组合的话可以参考下面的这个例子
 
 ```typescript
 type B = "A" | "B" | "C";
 
-type EE<T, U = T> = T extends U ? [T, Exclude<U, T>] : never
+type EE<T, U = T> = T extends U ? [T, Exclude<U, T>] : never;
 
 type ee = EE<B>; // type ee = ["A", "B" | "C"] | ["B", "A" | "C"] | ["C", "A" | "B"]
 ```
 
 所以就变成了上面答案的那个样子
+
+## 31. Medium Length of String
+
+```typescript
+type LengthOfString<
+  S extends string,
+  C extends any[] = []
+> = S extends `${infer P}${infer T}`
+  ? LengthOfString<T, [...C, P]>
+  : GetLength<C>;
+
+type GetLength<T extends readonly any[]> = T["length"];
+```
+
+**知识点**
+
+1. 使用`readonly any[]`得 length 方法可以获得对应数组得长度
+2. 所以这个递归得表达式，就是弄一个空数组不停得把第一个字符放进去，最后从字符串变成了`readonly`得数组就可以获得他得长度了
+
+## 32. Medium Flatten
+
+```typescript
+type Flatten<P extends any[], R extends any[] = []> = P extends [
+  infer First,
+  ...infer P
+]
+  ? First extends any[]
+    ? [...R, ...Flatten<First>, ...Flatten<P>]
+    : [...R, First, ...Flatten<P>]
+  : [];
+```
+
+**知识点**
+
+1. 没有条件创造条件，当前数组是多层得直接用 flatten 递归就行
+2. 创造一个空的泛型作为结果接收对应得数组内容即可
+
+## 33. Medium Append to Object
+
+```typescript
+type AppendToObject<
+  T extends object,
+  U extends string,
+  V,
+  R extends T = T & { [key in U]: V }
+> = {
+  [K in keyof R]: R[K];
+};
+```
+
+**知识点**
+
+1. 需要将两个对象合并之后，用对象遍历得方式输出一个新得对象。
+2. 如果直接 `A & B`这种写法好像用例过不了

@@ -12,8 +12,8 @@ type Permutation<T extends any, U = T> = (() => T) extends () => never
 
 // type EE<T, U = T> = T extends U ? [T, Exclude<U, T>] : never;
 
-type B = "A" | "B" | "C";
+// type B = "A" | "B" | "C";
 
-type EE<T, U = T> = T extends U ? [T, Exclude<U, T>] : never
+// type EE<T, U = T> = T extends U ? [T, Exclude<U, T>] : never
 
-type ee = EE<B>;
+// type ee = EE<B>;
