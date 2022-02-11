@@ -354,7 +354,6 @@ type LookUp<U extends { type: any }, T> = U extends infer P
 
 1. 勇敢的用`infer`直到判断出你想要的那个值
 
-
 ## 24. Medium TrimLeft
 
 ```typescript
@@ -366,5 +365,150 @@ type TrimLeft<T extends string> = T extends `${infer P}${infer K}`
 ```
 
 **知识点**
+
 1. 使用扩展运算符的时候也能使用`infer`进行类型的判断
-2. TS递归的使用
+2. TS 递归的使用
+
+## 25. Medium Trim
+
+```typescript
+type EmptyType = " " | "\t" | "\n";
+
+type TL<S extends string> = S extends `${infer P}${infer K}`
+  ? P extends " " | "\t" | "\n"
+    ? TL<K>
+    : S
+  : never;
+
+type TR<S extends string> = S extends `${infer P}${EmptyType}` ? TR<P> : S;
+
+type Trim<S extends string> = TR<TL<S>>;
+```
+
+**知识点**
+
+1. trimRight 不能和 TL 写的一样， 因为这里的 P 和 Ｋ其实是贪婪的抓取，不会想象成从末尾开始取，所以这里要明确 extends 是不是末尾有 EmptyType
+2. 对某个想要 TS 识别的特殊结构，直接枚举出来就行
+
+## 26. Medium Capitalize
+
+```typescript
+type CapMap = {
+  a: "A";
+  b: "B";
+  c: "C";
+  d: "D";
+  e: "E";
+  f: "F";
+  g: "G";
+  h: "H";
+  i: "I";
+  j: "J";
+  k: "K";
+  l: "L";
+  m: "M";
+  n: "N";
+  o: "O";
+  p: "P";
+  q: "Q";
+  r: "R";
+  s: "S";
+  t: "T";
+  u: "U";
+  v: "V";
+  w: "W";
+  x: "X";
+  y: "Y";
+  z: "Z";
+};
+
+type Capitalize1<S extends string> = S extends ""
+  ? ""
+  : S extends `${infer P}${infer T}`
+  ? P extends keyof CapMap
+    ? `${CapMap[P]}${T}`
+    : S
+  : never;
+```
+
+**知识点**
+
+1. 字符串模版的推断
+2. keyof 的使用
+
+## 27. Medium Replace
+
+```typescript
+type Replace<
+  S extends string,
+  From extends string,
+  To extends string
+> = From extends ""
+  ? S
+  : S extends `${infer T}${From}${infer Z}`
+  ? `${T}${To}${Z}`
+  : S;
+```
+
+**知识点**
+
+1. 字符串推断的类型可以是动态外部传入的
+
+## 28. Medium Replace All
+
+```typescript
+type ReplaceAll<
+  S extends string,
+  From extends string,
+  To extends string
+> = From extends ""
+  ? S
+  : S extends `${infer T}${From}${infer K}`
+  ? `${T}${To}${ReplaceAll<K, From, To>}`
+  : S;
+```
+
+**知识点**
+
+1. 字符串模版推断支持 TS 递归
+
+## 29. Medium Add Arguement
+
+```typescript
+type ARGS<T extends any> = T extends (...args: infer P) => any ? P : never;
+type MyReturn<T extends any> = T extends (...args: any[]) => infer P
+  ? P
+  : never;
+
+type AppendArgument<Fn, A> = (
+  ...args: [...ARGS<Fn>, ...[x: A]]
+) => MyReturn<Fn>;
+```
+
+**知识点**
+
+1. 函数参数的追加可以通过`...`扩展运算符来实现
+2. 定义参数类型就和函数定义参数类型的方式类似
+
+## 30. Medium Permutation
+
+```typescript
+type Permutation<T extends any, U = T> = (() => T) extends () => never
+  ? []
+  : T extends U
+  ? [T, ...Permutation<Exclude<U, T>>]
+  : [];
+```
+
+**知识点**
+1. type是"a" | "b" | "c", 如果想去掉一个类型，剩下两个自由组合的话可以参考下面的这个例子
+
+```typescript
+type B = "A" | "B" | "C";
+
+type EE<T, U = T> = T extends U ? [T, Exclude<U, T>] : never
+
+type ee = EE<B>; // type ee = ["A", "B" | "C"] | ["B", "A" | "C"] | ["C", "A" | "B"]
+```
+
+所以就变成了上面答案的那个样子

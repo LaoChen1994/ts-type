@@ -12,12 +12,3 @@ type Chainable<T extends object = {}> = {
   get(): T;
 };
 
-declare const a: Chainable;
-
-const result = a
-  .option("foo", 123)
-  .option("bar", { value: "Hello World" })
-  .option("name", "type-challenges")
-  .get();
-
-type bb = typeof result;
