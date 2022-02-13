@@ -567,3 +567,155 @@ type AppendToObject<
 
 1. 需要将两个对象合并之后，用对象遍历得方式输出一个新得对象。
 2. 如果直接 `A & B`这种写法好像用例过不了
+
+
+## 34 Medium Absolute
+
+```typescript
+type Absolute<T extends string | number | bigint> = (
+  T extends any ? `${T}` : never
+) extends `-${infer P}`
+  ? P
+  : `${T}`;
+```
+
+**知识点**
+1. 使用模板字符串的方式，将数字变为字符串类型。
+2. extends做`infer`推断的时候，如果我们想让其满足某个定义的模式，直接通过模板字符串来做就行，这里的`P`会变成一个负数的数字部分了
+
+## 35. Medium String to Union
+
+```typescript
+type StringToUnion<
+  T extends string,
+  R extends object = {}
+> = T extends `${infer P}${infer K}`
+  ? P extends ""
+    ? keyof R
+    : StringToUnion<K, R & { [key in P]: 1 }>
+  : keyof R;
+```
+
+**知识点**
+
+1. 需要转成联合类型可以使用`keyof object`
+2. 利用创造的泛型来接收参数
+
+## 36. Medium Merge
+
+```typescript
+type MergeObj<F extends object, S extends object> = {
+  [K in keyof S]: S[K];
+} & {
+  [K in Exclude<keyof F, keyof S>]: F[K];
+};
+
+type Merge<
+  F extends object,
+  S extends object,
+  R extends object = MergeObj<F, S>
+> = {
+  [K in keyof R]: R[K];
+};
+```
+
+**知识点**
+1. 当两个对象需要合并的时候需要两步：1. 先将两个对象用 `&`连接 2. 再遍历一次这个对象就可以了。
+
+## 37. Medium CamelCase
+
+```typescript
+type isNever<T> = (() => T) extends () => never ? true : false;
+type Letter = {
+  a: "A";
+  b: "B";
+  c: "C";
+  d: "D";
+  e: "E";
+  f: "F";
+  g: "G";
+  h: "H";
+  i: "I";
+  j: "J";
+  k: "K";
+  l: "L";
+  m: "M";
+  n: "N";
+  o: "O";
+  p: "P";
+  q: "Q";
+  r: "R";
+  s: "S";
+  t: "T";
+  u: "U";
+  v: "V";
+  w: "W";
+  x: "X";
+  y: "Y";
+  z: "Z";
+};
+
+type CamelCase<
+  S extends string,
+  F extends any = never,
+  R extends string = ""
+> = S extends `${infer T}${infer P}`
+  ? isNever<F> extends false
+    ? T extends Letter[keyof Letter]
+      ? CamelCase<`${P}`, never, `${R}-${T}`>
+      : T extends keyof Letter
+      ? CamelCase<`${P}`, never, `${R}${Letter[T]}`>
+      : CamelCase<P, F, `${R}${T}`>
+    : T extends keyof Letter
+    ? CamelCase<P, never, `${R}${T}`>
+    : T extends "-"
+    ? P extends ""
+      ? `${R}-`
+      : CamelCase<P, false, `${R}`>
+    : CamelCase<P, F, `${R}${T}`>
+  : R;
+
+```
+
+**知识点**
+1. 没有特殊的，就是把对应特殊的case用extends判断出来，再用递归生成类型就可以
+
+## 38. Medium KebaCase
+
+```typescript
+type KebabCase<
+  S extends string,
+  R extends string = ""
+> = S extends `${infer D}${infer P}`
+  ? D extends Letter[keyof Letter]
+    ? KebabCase<
+        P,
+        R extends "" ? `${Uncapitalize<D>}` : `${R}-${Uncapitalize<D>}`
+      >
+    : KebabCase<P, `${R}${D}`>
+  : R;
+```
+
+**知识点**
+1. 递归和infer的使用
+
+## 39. Medium Diff
+
+```typescript
+type Diff<
+  O,
+  O1,
+  K1 extends keyof O = keyof O,
+  K2 extends keyof O1 = keyof O1,
+  R = {
+    [K in Exclude<K1, K2>]: O[K];
+  } & {
+    [K in Exclude<K2, K1>]: O1[K];
+  }
+> = {
+  [K in keyof R]: R[K];
+};
+```
+
+**知识点**
+1. `Exclude`和对象合并的写法
