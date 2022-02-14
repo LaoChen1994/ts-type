@@ -719,3 +719,64 @@ type Diff<
 
 **知识点**
 1. `Exclude`和对象合并的写法
+
+## 40. Medium any of 
+
+```typescript
+type isEmptyObject<T> = T extends object
+  ? keyof T extends never
+    ? true
+    : false
+  : false;
+
+type isTrue<T> = T extends []
+  ? false
+  : T extends []
+  ? false
+  : T extends 0
+  ? false
+  : T extends ""
+  ? false
+  : T extends false
+  ? false
+  : isEmptyObject<T> extends true
+  ? false
+  : true;
+
+type AnyOf<T extends readonly any[], R extends boolean = false> = T extends [
+  infer P,
+  ...infer K
+]
+  ? isTrue<P> extends true
+    ? true
+    : AnyOf<K, R>
+  : R;
+```
+
+**知识点**
+1. 对于false场景的劣局
+2. 对于空对象的判断
+3. 递归
+
+
+## 41. Medium is never
+
+```typescript
+type IsNever<T> = (() => T) extends () => never ? true : false;
+```
+
+**知识点**
+1. never / false /boolean这些判断需要额外将其包装成函数/数组才能做判断,单独判断 `false extends boolean => true` 这是判断不出来的
+
+
+## 42. Medium isUnion
+
+```typescript
+
+type IsUnion<T> = Permutation<T>["length"] extends 1 ? false : true;
+
+```
+
+**知识点**
+
+1. 全排列数量大于2即可，所以参考使用之前的全排列类型即可。
