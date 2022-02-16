@@ -1,12 +1,7 @@
-type RemoveIndexSignature<T, R extends any[] = []> = keyof T extends infer P
-  ? P extends string
-    // ? 
-    : never
-  : never;
-
-type Foo = {
-  [key: string]: any;
-  foo(): void;
+type RemoveIndexSignature<T extends any> = {
+  [K in keyof T as string extends K
+    ? never
+    : number extends K
+    ? never
+    : K]: T[K];
 };
-
-type CCC = RemoveIndexSignature<Foo>;

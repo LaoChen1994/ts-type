@@ -15,3 +15,5 @@ type cases = [
     Expect<Equal<PercentageParser<'10%'>, Case5>>,
     Expect<Equal<PercentageParser<'-99%'>, Case6>>,
 ]
+
+type CC = PercentageParser<'+1'>

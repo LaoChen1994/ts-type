@@ -766,7 +766,7 @@ type IsNever<T> = (() => T) extends () => never ? true : false;
 ```
 
 **知识点**
-1. never / false /boolean这些判断需要额外将其包装成函数/数组才能做判断,单独判断 `false extends boolean => true` 这是判断不出来的
+1. never / false / boolean这些判断需要额外将其包装成函数/数组才能做判断,单独判断 `false extends boolean => true` 这是判断不出来的
 
 
 ## 42. Medium isUnion
