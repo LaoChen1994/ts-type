@@ -568,7 +568,6 @@ type AppendToObject<
 1. 需要将两个对象合并之后，用对象遍历得方式输出一个新得对象。
 2. 如果直接 `A & B`这种写法好像用例过不了
 
-
 ## 34 Medium Absolute
 
 ```typescript
@@ -580,8 +579,9 @@ type Absolute<T extends string | number | bigint> = (
 ```
 
 **知识点**
+
 1. 使用模板字符串的方式，将数字变为字符串类型。
-2. extends做`infer`推断的时候，如果我们想让其满足某个定义的模式，直接通过模板字符串来做就行，这里的`P`会变成一个负数的数字部分了
+2. extends 做`infer`推断的时候，如果我们想让其满足某个定义的模式，直接通过模板字符串来做就行，这里的`P`会变成一个负数的数字部分了
 
 ## 35. Medium String to Union
 
@@ -620,6 +620,7 @@ type Merge<
 ```
 
 **知识点**
+
 1. 当两个对象需要合并的时候需要两步：1. 先将两个对象用 `&`连接 2. 再遍历一次这个对象就可以了。
 
 ## 37. Medium CamelCase
@@ -674,11 +675,11 @@ type CamelCase<
       : CamelCase<P, false, `${R}`>
     : CamelCase<P, F, `${R}${T}`>
   : R;
-
 ```
 
 **知识点**
-1. 没有特殊的，就是把对应特殊的case用extends判断出来，再用递归生成类型就可以
+
+1. 没有特殊的，就是把对应特殊的 case 用 extends 判断出来，再用递归生成类型就可以
 
 ## 38. Medium KebaCase
 
@@ -697,7 +698,8 @@ type KebabCase<
 ```
 
 **知识点**
-1. 递归和infer的使用
+
+1. 递归和 infer 的使用
 
 ## 39. Medium Diff
 
@@ -718,9 +720,10 @@ type Diff<
 ```
 
 **知识点**
+
 1. `Exclude`和对象合并的写法
 
-## 40. Medium any of 
+## 40. Medium any of
 
 ```typescript
 type isEmptyObject<T> = T extends object
@@ -754,10 +757,10 @@ type AnyOf<T extends readonly any[], R extends boolean = false> = T extends [
 ```
 
 **知识点**
-1. 对于false场景的劣局
+
+1. 对于 false 场景的劣局
 2. 对于空对象的判断
 3. 递归
-
 
 ## 41. Medium is never
 
@@ -766,17 +769,70 @@ type IsNever<T> = (() => T) extends () => never ? true : false;
 ```
 
 **知识点**
-1. never / false / boolean这些判断需要额外将其包装成函数/数组才能做判断,单独判断 `false extends boolean => true` 这是判断不出来的
 
+1. never / false / boolean 这些判断需要额外将其包装成函数/数组才能做判断,单独判断 `false extends boolean => true` 这是判断不出来的
 
 ## 42. Medium isUnion
 
 ```typescript
-
 type IsUnion<T> = Permutation<T>["length"] extends 1 ? false : true;
-
 ```
 
 **知识点**
 
-1. 全排列数量大于2即可，所以参考使用之前的全排列类型即可。
+1. 全排列数量大于 2 即可，所以参考使用之前的全排列类型即可。
+
+## 43. Medium ReplaceKey
+
+```typescript
+type ReplaceKeys<U extends object, T, Y extends object> = {
+  [K in keyof U]: K extends T ? (K extends keyof Y ? Y[K] : never) : U[K];
+};
+```
+
+**知识点**
+
+1. 如果一个 key 不想返回对应的值的时候，可以直接返回 never
+2. 直接 map 对象然后修改对应`key`的类型即可
+
+## 44. Medium Remove Index Signature
+
+```typescript
+type RemoveIndexSignature<T extends any> = {
+  [K in keyof T as string extends K
+    ? never
+    : number extends K
+    ? never
+    : K]: T[K];
+};
+```
+
+**知识点**
+
+1. 想要判断一个对象的 key 是否是泛类型，可以用`收窄`的方式来做
+2. `key`的定义也可以使用 extends
+
+## 45. Medium Percentage Parser
+
+```typescript
+type Notion = "+" | "-" | "%";
+
+type Handler2<T extends string, R extends any[] = []> = T extends `${infer X}%`
+  ? [...R, X, "%"]
+  : T extends string
+  ? [...R, T, ""]
+  : [...R, "", ""];
+
+type PercentageParser<
+  A extends string,
+  R extends any[] = []
+> = A extends `${infer P}${infer T}`
+  ? P extends Notion
+    ? Handler2<T, [...R, P]>
+    : Handler2<A, [...R, ""]>
+  : Handler2<A, [...R, ""]>;
+
+```
+
+**知识点**
+1. 无
