@@ -6,5 +6,5 @@ type NumberToTuple<
 type MinusOne<
   T extends number,
   R extends number[] = NumberToTuple<T>
-> = R extends [...infer P, infer X] ? P["length"] : 0;
+> = R extends [infer P, ...infer X] ? X["length"] : 0;
 
