@@ -831,8 +831,122 @@ type PercentageParser<
     ? Handler2<T, [...R, P]>
     : Handler2<A, [...R, ""]>
   : Handler2<A, [...R, ""]>;
-
 ```
 
 **知识点**
+
 1. 无
+
+## 46. Medium Drop Char
+
+```typescript
+type DropChar<
+  S,
+  C extends string,
+  R extends string = ""
+> = S extends `${infer P}${infer K}`
+  ? C extends ""
+    ? `${R}${DropChar<S, " ", R>}`
+    : P extends C
+    ? `${R}${DropChar<K, C, R>}`
+    : `${R}${P}${DropChar<K, C, "">}`
+  : R;
+```
+
+**知识点**
+
+1. 字符串拼接 + 递归
+
+## 47. Medium-minus-one
+
+```typescript
+type NumberToTuple<
+  T extends number,
+  U extends any[] = []
+> = U["length"] extends T ? U : NumberToTuple<T, [1, ...U]>;
+
+type MinusOne<
+  T extends number,
+  R extends number[] = NumberToTuple<T>
+> = R extends [infer P, ...infer X] ? X["length"] : 0;
+```
+
+**知识点**
+
+1. 如果将一个数字扩展成一个数组，使用之前的`length`获取数组长度的方法和这个常量的数字通过`extends`进行比较即可
+2. 还是利用`length`求得`-1`后的长度
+
+## 48. Medium pick by type
+
+```typescript
+type PickByType<T extends object, U, K extends keyof T = keyof T> = {
+  [key in K extends K ? (T[K] extends U ? K : never) : never]: U;
+};
+```
+
+**知识点**
+
+1. 关键在于如何将一个对象真实的`key`过滤出来，那些泛化的`[key: string]`过滤掉
+
+```typescript
+type a = {
+  a: 1;
+  b: 2;
+};
+// K extends K 可以只获取有参数名的key，那些泛型的key就过滤掉了
+type CC<T extends object, K extends keyof T = keyof T> = K extends K
+  ? K
+  : never;
+
+type cc = CC<a>;
+```
+
+2. 使用`key`返回为 never 的方式过滤掉无用的`key`
+
+## 49. Medium Start With
+
+```typescript
+type StartsWith<T extends string, U extends string> = T extends `${U}${infer P}`
+  ? true
+  : false;
+```
+
+## 50. Medium End with
+
+```typescript
+type EndsWith<T extends string, U extends string> = T extends `${infer P}${U}`
+  ? true
+  : false;
+```
+
+## 51. Medium Partial By Keys
+
+```typescript
+type RealKey<K> = K extends K ? K : never;
+
+type RealObj<T extends object, K extends keyof T = keyof T> = {
+  [key in RealKey<K>]: T[K];
+};
+
+type PartialByKeys<
+  T extends object,
+  K extends string = "",
+  R extends keyof T = keyof T,
+  V extends object = {
+    [key in Exclude<RealKey<R>, K>]: T[key];
+  } & {
+    [key in K extends RealKey<keyof T> ? K : never]?: T[key];
+  }
+> = K extends ""
+  ? {
+      [key in keyof V]?: V[key];
+    }
+  : {
+      [key in keyof V]: V[key];
+    };
+```
+
+**知识点**
+
+1. 两个 `&`连接的对象需要重新遍历一下，这样才能真正组合成一个对象的来行
+2. 48题中提到的相关点
