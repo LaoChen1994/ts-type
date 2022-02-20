@@ -7,6 +7,3 @@ type cases = [
   Expect<Equal<Replace<'foobarbar', 'bra', 'foo'>, 'foobarbar'>>,
   Expect<Equal<Replace<'', '', ''>, ''>>,
 ]
-
-
-type cc = Replace<'foobar', 'bar', 'foo'>

@@ -12,10 +12,3 @@ type Includes<T extends readonly any[], U> = T extends [
     ? true
     : Includes<Rest, U>
   : false;
-
-// type A<X> = <T>() => T extends X ? 1 : 2;
-// type a = A<{ a: "A" }>;
-// type b = A<false>;
-
-// type c = A<boolean> extends A<false> ? true : false;
-// type e = a extends b ? true : false;

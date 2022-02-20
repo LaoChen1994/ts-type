@@ -7,6 +7,3 @@ type cases = [
   Expect<Equal<MinusOne<100>, 99>>,
   Expect<Equal<MinusOne<1101>, 1100>>,
 ]
-
-
-type CC = MinusOne<1101>

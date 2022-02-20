@@ -950,3 +950,37 @@ type PartialByKeys<
 
 1. 两个 `&`连接的对象需要重新遍历一下，这样才能真正组合成一个对象的来行
 2. 48题中提到的相关点
+
+## 52. Medium Required By Keys
+
+```typescript
+type MyRequired<T extends object> = {
+  [K in keyof T]-?: T[K];
+};
+
+type RequiredByKeys<
+  T extends object,
+  K extends any = never,
+  R extends object = isNever<K> extends true
+    ? MyRequired<T>
+    : {
+        [key in Exclude<keyof T, K>]?: MyRequired<T>[key];
+      } & {
+        [key in Extract<K, keyof T>]: MyRequired<T>[key];
+      }
+> = {
+  [key in keyof R]: R[key];
+};
+```
+
+**知识点**
+Q1: 如何去除typescript中的关键字，比如`?`和`readonly`等
+A1：使用`-`这个关键字
+
+## 53. Medium Mutable
+
+```typescript
+type Mutable<R extends object> = {
+  -readonly [K in keyof Readonly<R>]: R[K];
+};
+```

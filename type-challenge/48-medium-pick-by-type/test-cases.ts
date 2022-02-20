@@ -12,6 +12,3 @@ type cases = [
   Expect<Equal<PickByType<Model, string>, { name: string }>>,
   Expect<Equal<PickByType<Model, number>, { count: number }>>,
 ]
-
-
-type CCC = PickByType<Model, boolean>

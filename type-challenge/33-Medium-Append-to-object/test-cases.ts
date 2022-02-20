@@ -42,5 +42,3 @@ type cases = [
   Expect<Equal<AppendToObject<test2, 'home', 1>, testExpect2>>,
   Expect<Equal<AppendToObject<test3, 'isMotherRussia', false | undefined>, testExpect3>>,
 ]
-
-type CCC = AppendToObject<test1, 'home', boolean>
