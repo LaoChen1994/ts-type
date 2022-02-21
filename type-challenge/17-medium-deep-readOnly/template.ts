@@ -7,24 +7,5 @@ type DeepReadonly<T> = {
 };
 
 type DeepReadonly2<T> = {
-  readonly [K in keyof T]: keyof T[K] extends never ? T[K] : DeepReadonly<T[K]>;
+  readonly [K in keyof T]: keyof T[K] extends never ? T[K] : DeepReadonly2<T[K]>;
 };
-
-type X = {
-  a: () => 22;
-  b: string;
-  c: {
-    d: boolean;
-    e: {
-      g: {
-        h: {
-          i: true;
-          j: "string";
-        };
-        k: "hello";
-      };
-    };
-  };
-};
-
-type b = DeepReadonly<X>;
