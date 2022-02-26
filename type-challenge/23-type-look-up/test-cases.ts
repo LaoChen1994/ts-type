@@ -13,8 +13,6 @@ interface Dog {
 
 type Animal = Cat | Dog
 
-type bb = LookUp<Animal, 'dog'>
-
 type cases = [
   Expect<Equal<LookUp<Animal, 'dog'>, Dog>>,
   Expect<Equal<LookUp<Animal, 'cat'>, Cat>>,

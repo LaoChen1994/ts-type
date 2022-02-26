@@ -236,8 +236,6 @@ type DeepReadonly2<T> = {
   readonly [K in keyof T]: keyof T[K] extends never ? T[K] : DeepReadonly<T[K]>;
 };
 
-## 18.
-
 ```
 
 **知识点**
