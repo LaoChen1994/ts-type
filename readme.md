@@ -1009,3 +1009,99 @@ type ObjectEntries<
 
 1. `-`的使用方法
 2. 使用`K extends K`去除泛型类型
+
+
+## 56. Medium Shift
+
+```typescript
+type Shift<T extends any[]> = T extends [infer P, ...infer X] ? X : never
+```
+
+## 57. Medium Tuple Nested object
+
+```typescript
+type TupleToNestedObject<T extends string[], U> = T["length"] extends 0
+  ? U
+  : T extends [...infer R, infer P]
+  ? R extends string[]
+    ? P extends string
+      ? TupleToNestedObject<R, { [key in P]: U }>
+      : never
+    : never
+  : never;
+```
+
+**知识点**
+1. 如何判断一个数组遍历完了，就是`length extends 0`
+
+## 58. Medium Reverse 
+
+```typescript
+type Reverse<T extends any[]> = T extends [infer P, ...infer K]
+  ? [...Reverse<K>, P]
+  : [];
+```
+
+## 59. Medium Flip Arguements
+
+```typescript
+type FlipArguments<T> = T extends (...args: infer P) => infer R
+  ? (...args: Reverse<P>) => R
+  : never;
+```
+
+**知识点**
+1. 函数类型的推断
+2. 函数参数的参数用数组加上`...`运算符，可以转换为`,`分割的参数
+
+## 60. Medium Flatten Depth
+
+```typescript
+type FlattenDepth<
+  T extends any[],
+  N = 1,
+  R extends any[] = [],
+  C extends any[] = []
+> = T extends [infer P, ...infer K]
+  ? C["length"] extends N
+    ? [...R, ...T]
+    : P extends any[]
+    ? FlattenDepth<K, N, [...R, ...FlattenDepth<P, N, [], [...C, number]>], C>
+    : FlattenDepth<K, N, [...R, P], C>
+  : R;
+```
+
+**知识点**
+1. 用数组的`length`来进行记数
+2. 使用默认值来实现参数递归过程中叠加
+
+## 61. Medium Bem Style String
+
+```typescript
+type BEM<
+  B extends string,
+  E extends string[],
+  M extends string[]
+> = E["length"] extends 0
+  ? M["length"] extends 0
+    ? B
+    : M extends (infer P)[]
+    ? P extends string
+      ? `${B}--${P}`
+      : B
+    : B
+  : E extends (infer P)[]
+  ? P extends string
+    ? M["length"] extends 0
+      ? `${B}__${P}`
+      : M extends (infer R)[]
+      ? R extends string
+        ? `${B}__${P}--${R}`
+        : B
+      : B
+    : B
+  : B;
+```
+
+**知识点**
+1. 各种通过`extends`的判断罢了，没有细节
