@@ -507,7 +507,8 @@ type B = "A" | "B" | "C";
 
 type EE<T, U = T> = T extends U ? [T, Exclude<U, T>] : never;
 
-type ee = EE<B>; // type ee = ["A", "B" | "C"] | ["B", "A" | "C"] | ["C", "A" | "B"]
+type ee = EE<B>; 
+// type ee = ["A", "B" | "C"] | ["B", "A" | "C"] | ["C", "A" | "B"]
 ```
 
 所以就变成了上面答案的那个样子
@@ -1103,3 +1104,54 @@ type BEM<
 
 **知识点**
 1. 各种通过`extends`的判断罢了，没有细节
+
+## 62. Medium in order traversal
+
+```typescript
+interface TreeNode {
+  val: number;
+  left: TreeNode | null;
+  right: TreeNode | null;
+}
+
+type InorderTraversal<T extends TreeNode | null> = T extends TreeNode
+  ? T["left"] extends never
+    ? [T["val"]]
+    : T["left"] extends TreeNode
+    ? [
+        ...InorderTraversal<T["left"]>,
+        T["val"],
+        ...InorderTraversal<T["right"]>
+      ]
+    : T["right"] extends TreeNode
+    ? [T["val"], ...InorderTraversal<T["right"]>]
+    : [T["val"]]
+  : [];
+```
+
+**知识点**
+1. 一个关于二叉树的先序遍历，只要知道遍历方法就能做出来~
+2. 关于类型推断的遍历
+
+## 63. Medium Flip
+
+```typescript
+type TransKeyToString<T> = T extends boolean | string | number ? `${T}` : "";
+
+type Flip<
+  T extends object,
+  K extends keyof T = keyof T,
+  V extends T[K] = T[K]
+> = {
+  [key in TransKeyToString<V>]: K extends K
+    ? TransKeyToString<T[K]> extends key
+      ? K
+      : never
+    : never;
+};
+```
+
+**知识点**
+
+1. 如果不想返回某个类型，可以返回never
+2. 使用`K extends`将泛型key删除
