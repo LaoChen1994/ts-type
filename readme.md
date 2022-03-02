@@ -1155,3 +1155,53 @@ type Flip<
 
 1. 如果不想返回某个类型，可以返回never
 2. 使用`K extends`将泛型key删除
+
+## 64. Medium Fibonacci
+
+```typescript
+type ArraysLength<T, K> = T extends any[]
+  ? K extends any[]
+    ? [...T, ...K]["length"]
+    : T["length"]
+  : K extends any[]
+  ? K["length"]
+  : 0;
+
+type Fibonacci<
+  T extends number,
+  C extends number[] = [number],
+  V extends any[][] = [[number], [number]]
+> = C["length"] extends T
+  ? V extends [infer X, infer Y]
+    ? X extends any[]
+      ? X["length"]
+      : 0
+    : 0
+  : V extends [infer X, infer Y]
+  ? X extends any[]
+    ? Y extends any[]
+      ? Fibonacci<T, [...C, number], [Y, [...X, ...Y]]>
+      : 0
+    : 0
+  : 0;
+```
+
+## 65. Medium All Combinations
+
+```typescript
+type MyExclude2<T, R> = R extends T ? "" : R
+
+type AllCombinations<S extends string> = S extends ""
+  ? ""
+  : S extends `${infer P}${infer T}`
+  ?
+      | P
+      | AllCombinations<T>
+      | `${AllCombinations<T>}${P}`
+      | `${P}${AllCombinations<T>}`
+  : "";
+```
+
+**知识点**
+
+1. 这道题目只完成了一半，其中的3、4两个case是跑不过的，主要原因是缺失了对于`BAC`就是将P插入到T中的那种场景的枚举（后续补上）
