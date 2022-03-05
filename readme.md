@@ -757,7 +757,7 @@ type AnyOf<T extends readonly any[], R extends boolean = false> = T extends [
 
 **知识点**
 
-1. 对于 false 场景的劣局
+1. 对于 false 场景的列举
 2. 对于空对象的判断
 3. 递归
 
