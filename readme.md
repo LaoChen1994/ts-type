@@ -1205,3 +1205,183 @@ type AllCombinations<S extends string> = S extends ""
 **知识点**
 
 1. 这道题目只完成了一半，其中的3、4两个case是跑不过的，主要原因是缺失了对于`BAC`就是将P插入到T中的那种场景的枚举（后续补上）
+
+## 66. Medium Greater than
+
+```typescript
+type GreaterThan<
+  T extends number,
+  U extends number,
+  A extends any[] = []
+> = T extends A["length"]
+  ? false
+  : U extends A["length"]
+  ? true
+  : GreaterThan<T, U, [...A, number]>;
+```
+
+**知识点**
+
+1. 用`tuple length`来管控长度
+2. 递归的方式来实现
+
+## 67 Medium Zip
+
+```typescript
+type Zip<
+  T extends any[],
+  U extends any[],
+  R extends any[] = []
+> = T["length"] extends 0
+  ? R
+  : T extends [infer A, ...infer B]
+  ? U extends [infer C, ...infer D]
+    ? Zip<B, D, [...R, [A, C]]>
+    : R
+  : R;
+```
+
+## 68. Medium isTuple
+
+```typescript
+type IsTuple<T> = T extends []
+  ? true
+  : T extends readonly [infer P, ...infer R]
+  ? true
+  : false;
+```
+
+**知识点**
+
++ 对于tuple的判断根据以下两点：
+
+  + 使用readonly
+  + 使用`infer`能推断出具体类型，如果是array是推断不出来具体某一项的类型的
+
+
+## 69. Medium Chunk
+
+```typescript
+type Chunk<
+  T extends readonly any[],
+  N extends number,
+  R extends any[] = [],
+  C extends any[] = []
+> = T extends [infer A, ...infer B]
+  ? C["length"] extends N
+    ? Chunk<B, N, [...R, C], [A]>
+    : Chunk<B, N, R, [...C, A]>
+  : C extends []
+  ? R
+  : [...R, C];
+
+```
+
+**知识点**
+
++ 简单的递归，只需要对零界点做相关判断即可
+
+
+## 70. Medium Fill
+
+```typescript
+type Slice<
+  T extends any[],
+  Start extends number = 0,
+  End extends number = T["length"],
+  R extends any[] = [],
+  Count extends any[] = []
+> = Count["length"] extends T["length"]
+  ? R
+  : Count["length"] extends End
+  ? R
+  : Count["length"] extends Start
+  ? Slice<T, Start, End, [...R, T[Start]], [...Count, number]>
+  : R extends []
+  ? Slice<T, Start, End, R, [...Count, number]>
+  : Slice<T, Start, End, [...R, T[Count["length"]]], [...Count, number]>;
+
+type FillArray<
+  N,
+  Start extends number,
+  End extends number,
+  MaxLength extends number,
+  R extends any[] = [],
+  Count extends any[] = []
+> = Count["length"] extends MaxLength
+  ? R
+  : Count["length"] extends End
+  ? R
+  : Count["length"] extends Start
+  ? FillArray<N, Start, End, MaxLength, [N], [...Count, number]>
+  : R["length"] extends 0
+  ? FillArray<N, Start, End, MaxLength, R, [...Count, number]>
+  : FillArray<N, Start, End, MaxLength, [...R, N], [...Count, number]>;
+
+type Fill<
+  T extends unknown[],
+  N,
+  Start extends number = 0,
+  End extends number = T["length"],
+  StartArray extends any[] = Slice<T, 0, Start>,
+  EndArray extends any[] = Slice<T, End, T["length"]>,
+  R extends any[] = FillArray<N, Start, End, T["length"]>
+> = GreaterThan<Start, End> extends true
+  ? T
+  : T extends []
+  ? []
+  : [...StartArray, ...R, ...EndArray];
+```
+
+**知识点**
+
+1. 这是个综合的题目通过Slice + Array Fill拆解成两个递归来完成这个功能
+
+2. 通过之前的GreaterThan来做边界的判断
+
+## 71. Medium Trim Right
+
+```typescript
+type EmptyLetter = " " | "\n" | "\t";
+
+type TrimRight<S extends string> = S extends `${infer P}${EmptyLetter}`
+  ? TrimRight<P>
+  : S;
+```
+
+**知识点**
+
+1. 之前在Trim中已经介绍过，主要就是拼接字符串的`extends`判断
+
+## 72. Medium Without
+
+```typescript
+type FormatArray<T> = T extends any[] ? T : [T];
+
+type Without<
+  T extends any[],
+  U,
+  R extends any[] = [],
+  K extends any[] = FormatArray<U>
+> = T extends [infer P, ...infer C]
+  ? Includes<K, P> extends true
+    ? Without<C, U, R>
+    : Without<C, U, [...R, P]>
+  : R;
+```
+
+## 73. Medium Trunck
+
+```typescript
+type N2S<T extends number | string> = `${T}`;
+
+type Trunc<
+  T extends number | string,
+  RS extends string = N2S<T>,
+  R extends string = ""
+> = RS extends `${infer A}${infer B}${infer C}`
+  ? B extends "."
+    ? `${R}${A}`
+    : Trunc<T, `${B}${C}`, `${R}${A}`>
+  : `${R}${RS}`;
+```
