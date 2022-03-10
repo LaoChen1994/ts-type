@@ -1385,3 +1385,105 @@ type Trunc<
     : Trunc<T, `${B}${C}`, `${R}${A}`>
   : `${R}${RS}`;
 ```
+
+## 74. Medium Index Of
+
+```typescript
+type IndexOf<
+  T extends any[],
+  U,
+  C extends any[] = []
+> = C["length"] extends T["length"]
+  ? -1
+  : T[C["length"]] extends U
+  ? C["length"]
+  : IndexOf<T, U, [...C, number]>;
+```
+
+**知识点**
+1. 使用数组的index索引，可以借用别人的length，套娃的结构，其他没啥
+
+
+## 75. Medium Join
+
+```typescript
+type Join<
+  T extends string[],
+  U extends number | string,
+  C extends any[] = [number],
+  S extends string = T[0]
+> = T extends []
+  ? ""
+  : T["length"] extends C["length"]
+  ? S
+  : Join<T, U, [...C, number], `${S}${U}${T[C["length"]]}`>;
+```
+
+## 76. Medium Last Index Of 
+
+```typescript
+type LastIndexOf<T extends any[], U> = T extends [...infer A, infer B]
+  ? B extends U
+    ? A["length"]
+    : LastIndexOf<A, U>
+  : -1;
+```
+
+## 77. Medium Unique
+
+```typescript
+type MyIncludes<T extends any[], U> = T extends [infer P, ...infer K]
+  ? P extends U
+    ? true
+    : MyIncludes<K, U>
+  : false;
+
+type Unique<T extends any[], R extends any[] = []> = T extends [
+  infer P,
+  ...infer A
+]
+  ? MyIncludes<R, P> extends false
+    ? Unique<A, [...R, P]>
+    : Unique<A, R>
+  : R;
+```
+
+### 78. Medium Map Types
+
+```typescript
+interface IMapDTO {
+  mapFrom: any;
+  mapTo: any;
+}
+
+type MapTypes<T extends object, R extends IMapDTO> = {
+  [K in keyof T]: T[K] extends R["mapFrom"]
+    ? R extends { mapFrom: T[K] }
+      ? R["mapTo"]
+      : never
+    : T[K];
+};
+```
+
+**知识点**
+1. 如果在联合类型中确定某一个类型，比如我们这里希望 `mapFrom`为`string`类型的时候`mapTo`也为`string`匹配的类型，这个时候可以使用双向`extends`进行确认
+
+### 79. Hard Simple Vue
+
+```typescript
+type IComputedValues<C> = {
+  [K in keyof C]: C[K] extends (...args: any[]) => infer P ? P : never;
+};
+
+declare function SimpleVue<D, C, M>(options: {
+  data: (this: {}) => D,
+  computed: C & ThisType<D>,
+  methods: M & ThisType<D & M & IComputedValues<C>>
+}): any;
+```
+
+**知识点**
+
+1. `ThisType`的用处，将某个类型定义然后绑定到对应某个对象的this上（适用于对象this的添加）
+
+2. 函数`this`的添加，函数第一个参数为this的时候，ts直接将其翻译成对应的函数的`this`上下文指向
