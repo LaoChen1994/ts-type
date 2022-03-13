@@ -1487,3 +1487,68 @@ declare function SimpleVue<D, C, M>(options: {
 1. `ThisType`的用处，将某个类型定义然后绑定到对应某个对象的this上（适用于对象this的添加）
 
 2. 函数`this`的添加，函数第一个参数为this的时候，ts直接将其翻译成对应的函数的`this`上下文指向
+
+3. 这个地方我们除了需要`ThisType`将我们需要得类型追加到`this`上外，还需要对其本身得类型进行推断，所以这里需要定义一个额外得泛型来让TS自己推断，本身增加了哪些类型和方法
+
+
+### 80. Hard Curry
+
+```typescript
+type CurryFn<fn, R extends any = null> = fn extends (
+  ...args: infer P
+) => infer C
+  ? P extends [...infer A, infer B]
+    ? R extends null
+      ? CurryFn<(...args: A) => R, (args: B) => C>
+      : CurryFn<(...args: A) => R, (args: B) => R>
+    : R
+  : R;
+
+declare function Currying<R, C>(fn: C): CurryFn<C>
+```
+
+### 81. Hard Union to intersection
+
+```typescript
+type UnionToIntersection<U> = (
+  U extends any ? (args: U) => void : never
+) extends (args: infer P) => any
+  ? P
+  : never;
+```
+
+**知识点**
+
+1. 在函数参数的 `|` 会在`infer`推断的时候产生协变，将联合类型变为`intersection`，具体的可以看[官方文档](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#type-inference-in-conditional-types)
+
+### 82. hard get required
+
+```typescript
+type NoRequired<T extends object> = {
+  [key in keyof T]-?: T[key];
+};
+
+type GetRequired<
+  T extends object,
+  R extends T = NoRequired<T>,
+  K extends keyof T = keyof T
+> = {
+  [key in K extends K ? (T[K] extends R[K] ? K : never) : never]: T[key];
+};
+```
+
+**知识点**
+
+1. 如何判断一个值是一个`required`，即去掉`?`以后对应值的类型能保持一致即可
+
+### 83. hard get optional
+
+```typescript
+type GetOptional<
+  T extends object,
+  R extends T = NoRequired<T>,
+  K extends keyof T = keyof T
+> = {
+  [key in K extends K ? (T[K] extends R[K] ? never : K) : never]?: R[key];
+};
+```

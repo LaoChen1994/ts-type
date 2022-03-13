@@ -6,5 +6,3 @@ type cases = [
   Expect<Equal<TupleToNestedObject<['a', 'b', 'c'], boolean>, {a: {b: {c: boolean}}}>>,
   Expect<Equal<TupleToNestedObject<[], boolean>, boolean>>,
 ]
-
-type CCC = TupleToNestedObject<['a'], string>

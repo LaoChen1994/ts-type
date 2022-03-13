@@ -14,5 +14,3 @@ type cases = [
   Expect<Equal<ObjectEntries<Model>,ModelEntries>>,
   Expect<Equal<ObjectEntries<Partial<Model>>,ModelEntries>>,
 ]
-
-type CCC = ObjectEntries<Partial<Model>>

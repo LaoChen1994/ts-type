@@ -9,5 +9,3 @@ type cases = [
   Expect<Equal<FlattenDepth<[1, [2, [3, [4, [5]]]]], 3>, [1, 2, 3, 4, [5]]>>,
   Expect<Equal<FlattenDepth<[1, [2, [3, [4, [5]]]]], 19260817>, [1, 2, 3, 4, 5]>>,
 ]
-
-type CCC = FlattenDepth<[1, 2, [3, 4], [[[5]]]]>
