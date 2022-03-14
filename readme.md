@@ -1552,3 +1552,33 @@ type GetOptional<
   [key in K extends K ? (T[K] extends R[K] ? never : K) : never]?: R[key];
 };
 ```
+
+### 84. hard required keys
+
+```typescript
+type RequiredKeys<
+  T extends object,
+  C extends T = {
+    [K in keyof T]-?: T[K];
+  },
+  K extends keyof T = keyof T,
+  R extends object = {
+    [key in K extends K ? (T[K] extends C[K] ? K : never) : never]: T[K];
+  }
+> = keyof R;
+
+```
+
+**知识点**
+
+1. 用到了`Required`,然后利用`keyof`转换其为联合类型
+
+### 85. hard optional keys
+
+```typescript
+type OptionalKeys<T extends object, R = GetOptional<T>> = keyof R
+
+```
+
+**知识点**
+1. 和上面的题目一样，利用到了之前的`GetOptional`
