@@ -1582,3 +1582,51 @@ type OptionalKeys<T extends object, R = GetOptional<T>> = keyof R
 
 **知识点**
 1. 和上面的题目一样，利用到了之前的`GetOptional`
+
+### 86. Hard Capital Words
+
+```typescript
+type SplitType = " " | "." | ",";
+
+type CapitalizeWords<
+  S extends string,
+  R extends string = "",
+  F extends boolean = true
+> = S extends `${infer P}${infer T}`
+  ? F extends true
+    ? P extends keyof CapMap
+      ? CapitalizeWords<T, `${R}${CapMap[P]}`, false>
+      : CapitalizeWords<T, `${R}${P}`, F>
+    : P extends SplitType
+    ? CapitalizeWords<T, `${R}${P}`, true>
+    : CapitalizeWords<T, `${R}${P}`, F>
+  : R;
+```
+
+### 87. Hard Camel Case
+
+```typescript
+type SplitLetter = "_";
+
+type QueryValue<
+  T extends object,
+  V extends any,
+  K extends keyof T = keyof T
+> = K extends K ? T[K] extends V ? K : never : never
+
+type CamelCaseHard<
+  S extends string,
+  R extends string = "",
+  F extends boolean = false
+> = S extends `${infer P}${infer T}`
+  ? P extends SplitLetter
+    ? CamelCaseHard<T, R, true>
+    : F extends true
+    ? P extends keyof CapMap
+      ? CamelCaseHard<T, `${R}${CapMap[P]}`, false>
+      : CamelCaseHard<T, `${R}${P}`, false>
+    : P extends CapMap[keyof CapMap]
+    ? CamelCaseHard<T, `${R}${QueryValue<CapMap, P>}`, F>
+    : CamelCaseHard<T, `${R}${P}`, F>
+  : R;
+```
