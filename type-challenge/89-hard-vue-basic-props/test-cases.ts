@@ -1,7 +1,6 @@
 import { Equal, Expect, IsAny, Debug } from '@type-challenges/utils'
 
 class ClassA {}
-
 VueBasicProps({
   props: {
     propA: {},

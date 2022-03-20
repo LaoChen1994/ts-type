@@ -1630,3 +1630,130 @@ type CamelCaseHard<
     : CamelCaseHard<T, `${R}${P}`, F>
   : R;
 ```
+
+### 88. Hard C Printf Parser
+
+```typescript
+type ControlsMap = {
+  c: "char";
+  s: "string";
+  d: "dec";
+  o: "oct";
+  h: "hex";
+  f: "float";
+  p: "pointer";
+};
+
+type ParsePrintFormat<
+  S extends string,
+  R extends string[] = []
+> = S extends `${infer P}%${infer D}${infer T}`
+  ? D extends keyof ControlsMap
+    ? ParsePrintFormat<T, [...R, ControlsMap[D]]>
+    : D extends "%"
+    ? ParsePrintFormat<T, R>
+    : R
+  : R;
+```
+
+### 89. Hard Vue Basic Props
+
+```typescript
+type Computed<T> = {
+  [K in keyof T]: T[K] extends infer P
+    ? P extends (...args: any) => infer R
+      ? R
+      : never
+    : never;
+};
+
+type TypeCheck<T, K = any> = T extends () => infer A
+  ? A
+  : T extends (a: any) => infer C
+  ? C
+  : K;
+
+type A2U<T extends any[], R = null> = T extends [infer P, ...infer C]
+  ? R extends null
+    ? A2U<C, TypeCheck<P>>
+    : A2U<C, TypeCheck<P> | R>
+  : R;
+
+type Props<T> = {
+  [K in keyof T]: T[K] extends { type: infer A }
+    ? A extends () => infer C
+      ? C
+      : A extends new (...args: any) => any
+      ? InstanceType<A>
+      : A extends Array<infer B>
+      ? TypeCheck<B>
+      : RegExp
+    : TypeCheck<T[K]>;
+};
+
+declare function VueBasicProps<P, D, C, M>(options: {
+  props: P;
+  data: (this: Props<P>) => D;
+  computed: C & ThisType<D & Props<P>>;
+  methods: M & ThisType<D & Computed<C> & M & Props<P>>;
+}): any;
+```
+
+**知识点**
+1. 这里需要知道几个点`String`的类型是`StringConstructor`这种类型如何识别出来并转化成`string`，构造函数的定义为`(value?: any): string;`所以可以通过构造函数的这个结构`ReturnType`来进行将构造器转换成对应的类型
+
+2. 对于`ClassA`这类自定义的对象结构，可以通过`new (...args) => any`的方式类获取其类型，并通过`InstanceType`来获取对应的类型
+
+3. 这里需要注意的问题是，因为构造函数其也有这种`new **`的类型定义所以需要注意构造函数和类定义的两者判断的前后顺序
+
+### 90. Hard IsAny
+
+```typescript
+type IsAny<T> = 'ccc' extends true & T ? true : false;
+```
+
+**知识点**
+
+1. any类型 `&` 上任何类型都是any，所以可以通过这种方式来进行判断
+
+### 91. Hard Type Get
+
+```typescript
+type Get<T, K extends string> = K extends keyof T
+  ? T[K]
+  : K extends `${infer P}.${infer U}`
+  ? P extends keyof T
+    ? Get<T[P], U>
+    : never
+  : never;
+```
+
+**知识点**
+1. 关键还是对于模板字符串的判断，中间可以组合任意的东西来判断对应值的类型
+
+### 92. Hard String to Number
+
+```typescript
+type ToNumber<
+  S extends string,
+  R extends string[] = []
+> = `${R["length"]}` extends S ? R["length"] : ToNumber<S, [...R, string]>;
+```
+
+
+### 93. Hard Tuple Filter
+
+```typescript
+type isMatch<T, U> = (() => T) extends (() => U) ? true : false;
+
+type FilterOut<T extends any[], F, R extends any[] = []> = T extends [
+  infer U,
+  ...infer V
+]
+  ? isMatch<U, F> extends true
+    ? FilterOut<V, F, R>
+    : FilterOut<V, F, [...R, U]>
+  : R;
+
+type CCC = FilterOut<['a', never], never>
+```
