@@ -1757,3 +1757,45 @@ type FilterOut<T extends any[], F, R extends any[] = []> = T extends [
 
 type CCC = FilterOut<['a', never], never>
 ```
+
+### 94. Hard Tuple to Enum Object
+
+```typescript
+
+type Enum<T extends readonly string[], N extends boolean = false> = {
+  readonly [K in keyof T as T[K] extends string
+    ? Capitalize<T[K]>
+    : never]: K extends string ? (N extends false ? T[K] : ToNumber<K>) : never;
+}
+```
+
+**知识点**
+
+1. 如果需要在`key`中需要做value的判断，可以通过`as`关键字来连接两个不同的ts的值，然后加上`extends`来判断某一个值
+
+### 95. hard format
+
+```typescript
+type buildArray<
+  T extends string,
+  R extends any[] = []
+> = T extends `${infer A}%${infer B}${infer C}`
+  ? B extends "d"
+    ? buildArray<C, [...R, number]>
+    : B extends "s"
+    ? buildArray<C, [...R, string]>
+    : R
+  : R;
+
+type GenFn<P extends any[], R extends any = string> = P extends [
+  ...infer A,
+  infer B
+]
+  ? GenFn<A, (args: B) => R>
+  : R;
+
+type Format<
+  T extends string,
+  P extends any[] = buildArray<T>,
+> = GenFn<P>;
+```
